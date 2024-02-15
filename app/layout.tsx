@@ -5,12 +5,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Algo On Board",
-  description: "Whiteboard your algorithms and data structures",
+  title: "JIYUCHO",
+  description: "Whiteboard your algorithms and data structures"
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
