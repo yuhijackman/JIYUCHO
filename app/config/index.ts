@@ -12,8 +12,8 @@ export const PRODUCT_ITEMS = [
     icon: Code2
   },
   {
-    title: "Whiteboard",
-    link: "/whiteboard",
+    title: "Jiyucho",
+    link: "/jiyucho/1",
     icon: Presentation
   }
 ];
