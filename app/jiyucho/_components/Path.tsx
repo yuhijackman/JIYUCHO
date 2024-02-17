@@ -17,7 +17,7 @@ const Path = ({ layer, onPointerDown }: PathProps) => {
       style={{
         transform: `translate(${x}px, ${y}px)`
       }}
-      d={getSvgPathFromStroke(getStroke(points))}
+      d={getSvgPathFromStroke(getStroke(points, {simulatePressure: false, size: 5}))}
       x={0}
       y={0}
       strokeWidth={1}
