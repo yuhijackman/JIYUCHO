@@ -1,14 +1,14 @@
 import { colorToCss } from "@/lib/utils";
-import { PathLayer } from "@/types/canvas";
+import { PathShape } from "@/types/canvas";
 import {getSvgPathFromStroke} from "@/lib/utils";
 import {getStroke} from 'perfect-freehand'
 
 interface PathProps {
-  layer: PathLayer;
+  shape: PathShape;
   onPointerDown?: (e: React.PointerEvent) => void;
 }
-const Path = ({ layer, onPointerDown }: PathProps) => {
-  const { x, y, points, fill } = layer;
+const Path = ({ shape, onPointerDown }: PathProps) => {
+  const { x, y, points, fill } = shape;
 
   return (
     <path

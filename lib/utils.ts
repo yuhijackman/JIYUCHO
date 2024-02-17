@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Color } from "@/types/canvas";
+import { Color, Shape } from "@/types/canvas";
 import { VisibleArea } from "@/types/canvas";
 import { nanoid } from 'nanoid'
 
@@ -12,7 +12,7 @@ export function colorToCss(color: Color) {
   return `#${color.r.toString(16).padStart(2, "0")}${color.g.toString(16).padStart(2, "0")}${color.b.toString(16).padStart(2, "0")}`;
 }
 
-export function pointerEventToCanvasPoint(
+export function pointerPositionInCanvas(
   e: React.PointerEvent,
   area: VisibleArea,
 ) {
@@ -53,4 +53,25 @@ export function getSvgPathFromStroke(points: number[][]) {
 
 export const generateUUID = () => {
   return nanoid()
+}
+
+export function getShapesBoundaries(shapes: Shape[]): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} {
+  if (shapes.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+
+  // x is the leftmost x value of the shapes
+  const x = Math.min(...shapes.map((shape) => shape.x));
+  // y is the topmost y value of the shapes
+  const y = Math.min(...shapes.map((shape) => shape.y));
+  // width is determined by (maximum value of x in the shapes + width) - x
+  const width = Math.max(...shapes.map((shape) => shape.x + shape.width)) - x;
+  // height is determined by (maximum value of y in the shapes + height) - y
+  const height = Math.max(...shapes.map((shape) => shape.y + shape.height)) - y;
+  return { x, y, width, height };
 }

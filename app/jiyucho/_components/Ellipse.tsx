@@ -1,12 +1,12 @@
 import { colorToCss } from "@/lib/utils";
-import { EllipseLayer } from "@/types/canvas";
+import { EllipseShape } from "@/types/canvas";
 
 interface EllipseProps {
-  layer: EllipseLayer;
+  shape: EllipseShape;
   onPointerDown: (e: React.PointerEvent) => void;
 }
-const Ellipse = ({ layer, onPointerDown }: EllipseProps) => {
-  const { x, y, width, height, fill } = layer;
+const Ellipse = ({ shape, onPointerDown }: EllipseProps) => {
+  const { x, y, width, height, fill } = shape;
 
   return (
     <ellipse
@@ -15,10 +15,10 @@ const Ellipse = ({ layer, onPointerDown }: EllipseProps) => {
       style={{
         transform: `translate(${x}px, ${y}px)`
       }}
-      cx={layer.width / 2}
-      cy={layer.height / 2}
-      rx={layer.width / 2}
-      ry={layer.height / 2}
+      cx={width / 2}
+      cy={height / 2}
+      rx={width / 2}
+      ry={height / 2}
       strokeWidth={1}
       fill={fill ? colorToCss(fill) : "#000"}
     />

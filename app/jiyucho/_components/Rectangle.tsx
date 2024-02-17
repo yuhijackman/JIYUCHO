@@ -1,12 +1,12 @@
 import { colorToCss } from "@/lib/utils";
-import { RectangleLayer } from "@/types/canvas";
+import { RectangleShape } from "@/types/canvas";
 
 interface RectangleProps {
-  layer: RectangleLayer;
+  shape: RectangleShape;
   onPointerDown: (e: React.PointerEvent) => void;
 }
-const Rectangle = ({ layer, onPointerDown }: RectangleProps) => {
-  const { x, y, width, height, fill } = layer;
+const Rectangle = ({ shape, onPointerDown }: RectangleProps) => {
+  const { x, y, width, height, fill } = shape;
 
   return (
     <rect

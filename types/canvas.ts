@@ -9,16 +9,16 @@ export type VisibleArea = {
   y: number;
 };
 
-export enum LayerType {
+export enum ShapeType {
   Rectangle,
   Ellipse,
   Path,
   Text
 }
 
-export type RectangleLayer = {
+export type RectangleShape = {
   id: string;
-  type: LayerType.Rectangle;
+  type: ShapeType.Rectangle;
   x: number;
   y: number;
   height: number;
@@ -27,9 +27,9 @@ export type RectangleLayer = {
   value?: string;
 };
 
-export type EllipseLayer = {
+export type EllipseShape = {
   id: string;
-  type: LayerType.Ellipse;
+  type: ShapeType.Ellipse;
   x: number;
   y: number;
   height: number;
@@ -38,9 +38,9 @@ export type EllipseLayer = {
   value?: string;
 };
 
-export type PathLayer = {
+export type PathShape = {
   id: string;
-  type: LayerType.Path;
+  type: ShapeType.Path;
   x: number;
   y: number;
   height: number;
@@ -50,9 +50,9 @@ export type PathLayer = {
   value?: string;
 };
 
-export type TextLayer = {
+export type TextShape = {
   id: string;
-  type: LayerType.Text;
+  type: ShapeType.Text;
   x: number;
   y: number;
   height: number;
@@ -66,4 +66,4 @@ export type Point = {
   y: number;
 };
 
-export type Layer = RectangleLayer | EllipseLayer | PathLayer | TextLayer;
+export type Shape = RectangleShape | EllipseShape | PathShape | TextShape;

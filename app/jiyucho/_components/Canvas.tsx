@@ -4,34 +4,17 @@ import { useCallback, useState } from "react";
 
 import Toolbar, { Tool } from "../_components/Toolbar";
 import Path from "../_components/Path";
-import LayerPreview from "../_components/LayerPreview";
-import { VisibleArea, Layer, LayerType, Point } from "@/types/canvas";
-import {generateUUID, pointerEventToCanvasPoint} from "@/lib/utils";
+import ShapePreview from "../_components/ShapePreview";
+import SelectionBox from '../_components/SelectionBox';
+import { VisibleArea, Shape, ShapeType } from "@/types/canvas";
+import {generateUUID, pointerPositionInCanvas} from "@/lib/utils";
 
 const Canvas = () => {
   const [currentTool, setCurrentTool] = useState<Tool>(Tool.Select);
   const [visibleArea, setVisibleArea] = useState<VisibleArea>({ x: 0, y: 0 });
-  const [layers, setLayers] = useState<Layer[]>([
-    {
-      id: "1",
-      type: LayerType.Rectangle,
-      x: 10,
-      y: 10,
-      height: 100,
-      width: 100,
-      fill: { r: 0, g: 0, b: 0 }
-    },
-    {
-      id: "2",
-      type: LayerType.Ellipse,
-      x: 200,
-      y: 200,
-      height: 100,
-      width: 100,
-      fill: { r: 0, g: 0, b: 0 }
-    }
-  ]);
+  const [shapes, setShapes] = useState<Shape[]>([]);
   const [pencilPoints, setPencilPoints] = useState<number[][] | null>(null);
+  const [currentSelectedShapes, setCurrentSelectedShapes] = useState<Shape[]>([])
 
   const toolbarClickHandler = (tool: Tool) => {
     setCurrentTool(tool);
@@ -57,28 +40,66 @@ const Canvas = () => {
   }
 
   const pointerDownHandler = (e: React.PointerEvent) => {
-    const point = pointerEventToCanvasPoint(e, visibleArea);
+    const point = pointerPositionInCanvas(e, visibleArea);
+
     if (currentTool === Tool.Pencil) {
       startDrawing(point, e.pressure)
+      return
+    }
+    
+    if (currentTool === Tool.Rectangle) {
+      const newShape: Shape = {
+          id: generateUUID(),
+          type: ShapeType.Rectangle,
+          x: point.x,
+          y: point.y,
+          height: 100,
+          width: 100,
+          fill: { r: 0, g: 0, b: 0 }
+        }
+      setShapes([
+        ...shapes,
+        newShape
+      ]);
+      setCurrentSelectedShapes([newShape])
+      setCurrentTool(Tool.Select);
+    }
+
+    if (currentTool === Tool.Ellipse) {
+      const newShape: Shape =  {
+          id: generateUUID(),
+          type: ShapeType.Ellipse,
+          x: point.x,
+          y: point.y,
+          height: 100,
+          width: 100,
+          fill: { r: 0, g: 0, b: 0 }
+        }
+      setShapes([
+        ...shapes,
+        newShape,
+      ]);
+      setCurrentSelectedShapes([newShape])
+      setCurrentTool(Tool.Select);
     }
   }
 
   const pointerMoveHandler = (e: React.PointerEvent) => {
-    const point = pointerEventToCanvasPoint(e, visibleArea);
+    const point = pointerPositionInCanvas(e, visibleArea);
 
      if (currentTool === Tool.Pencil) {
       continueDrawing(point, e.pressure)
     }
   }
 
-  const pencilPathToLayer = () => {
+  const addPencilPathToShapes = () => {
     if (pencilPoints === null) return;
     
     const id = generateUUID()
 
-    setLayers([...layers, {
+    setShapes([...shapes, {
       id,
-      type: LayerType.Path,
+      type: ShapeType.Path,
       x: 0,
       y: 0,
       height: 0,
@@ -90,13 +111,13 @@ const Canvas = () => {
 
   const pointerUpHandler = (e: React.PointerEvent) => {
     if (currentTool === Tool.Pencil) {
-      pencilPathToLayer()
+      addPencilPathToShapes()
       setPencilPoints(null)
     }
   }
 
   return (
-    <div className="h-full bg-neutral-100 touch-none">
+    <div className="h-full bg-neutral-100 touch-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
       <div className="relative h-full">
         <div className="absolute top-[50%] -translate-y-[50%] left-2">
           <Toolbar currentTool={currentTool} onClick={toolbarClickHandler} />
@@ -115,22 +136,24 @@ const Canvas = () => {
               transform: `translate(${visibleArea.x}px, ${visibleArea.y}px)`
             }}
           >
-            {layers.map((layer) => {
+            {shapes.map((shape) => {
               return (
-                <LayerPreview
-                  key={layer.id}
-                  layer={layer}
+                <ShapePreview
+                  key={shape.id}
+                  shape={shape}
                   strokeColor="blue"
                   onPointerDown={(e) => {}}
                 />
               );
             })}
 
+            <SelectionBox shapes={currentSelectedShapes} />
+
             {pencilPoints && pencilPoints.length > 0 && (
               <Path
-                layer={{
+                shape={{
                   id: "pencil",
-                  type: LayerType.Path,
+                  type: ShapeType.Path,
                   x: 0,
                   y: 0,
                   height: 0,
