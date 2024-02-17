@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Toolbar, { Tool } from "../_components/Toolbar";
 import Path from "../_components/Path";
@@ -16,6 +16,13 @@ const Canvas = () => {
   const [pencilPoints, setPencilPoints] = useState<number[][] | null>(null);
   const [currentSelectedShapes, setCurrentSelectedShapes] = useState<Shape[]>([])
 
+  useEffect(() => {
+    document.body.classList.add("overflow-hidden", "overscroll-none");
+    return () => {
+      document.body.classList.remove("overflow-hidden", "overscroll-none");
+    };
+  }, []);
+  
   const toolbarClickHandler = (tool: Tool) => {
     setCurrentTool(tool);
   };
@@ -85,6 +92,7 @@ const Canvas = () => {
   }
 
   const pointerMoveHandler = (e: React.PointerEvent) => {
+    e.preventDefault();
     const point = pointerPositionInCanvas(e, visibleArea);
 
      if (currentTool === Tool.Pencil) {
