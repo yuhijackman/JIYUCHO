@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Color, Shape } from "@/types/canvas";
+import { Color, Shape, Boundaries } from "@/types/canvas";
 import { VisibleArea } from "@/types/canvas";
 import { nanoid } from 'nanoid'
 
@@ -55,12 +55,7 @@ export const generateUUID = () => {
   return nanoid()
 }
 
-export function getShapesBoundaries(shapes: Shape[]): {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-} {
+export function getShapesBoundaries(shapes: Shape[]): Boundaries {
   if (shapes.length === 0) {
     return { x: 0, y: 0, width: 0, height: 0 };
   }

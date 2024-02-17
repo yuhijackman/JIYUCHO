@@ -66,4 +66,11 @@ export type Point = {
   y: number;
 };
 
+export type Boundaries = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type Shape = RectangleShape | EllipseShape | PathShape | TextShape;
