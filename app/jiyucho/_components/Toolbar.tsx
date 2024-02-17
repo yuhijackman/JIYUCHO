@@ -4,7 +4,7 @@ export enum Tool {
   Select,
   Ellipse,
   Rectangle,
-  Path,
+  Pencil,
   Text
 }
 
@@ -17,7 +17,7 @@ const TOOLBAR_ITEMS = [
   { icon: <MousePointer2 />, tool: Tool.Select },
   { icon: <Circle />, tool: Tool.Ellipse },
   { icon: <Square />, tool: Tool.Rectangle },
-  { icon: <Pencil />, tool: Tool.Path },
+  { icon: <Pencil />, tool: Tool.Pencil },
   { icon: <Type />, tool: Tool.Text }
 ];
 
