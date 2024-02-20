@@ -21,6 +21,7 @@ const Canvas = () => {
   const [currentCanvasMode, setCurrentCanvasMode] = useState<CanvasMode>(CanvasMode.None);
   const [pencilPoints, setPencilPoints] = useState<number[][] | null>(null);
   const currentSelectedShapes = currentSelectedShapeIds.map((id) => shapes.get(id)).filter((shape) => shape !== undefined) as Shape[]
+  const [eventOccuredPoint, setEventOccuredPoint] = useState<{x: number, y: number} | null>(null)
 
   const {calculateXYWHAfterResize,
     updateResizeHandleType,
@@ -75,6 +76,8 @@ const Canvas = () => {
 
   const pointerDownOnShapeHandler = (e: React.PointerEvent, shape: Shape) => {
     e.stopPropagation();
+    const point = pointerPositionInCanvas(e, visibleArea);
+    setEventOccuredPoint(point)
 
     if (currentTool === Tool.Select) {
       setCurrentCanvasMode(CanvasMode.Moving)
@@ -141,17 +144,21 @@ const Canvas = () => {
     } else if (currentCanvasMode === CanvasMode.Resizing) {
       resizeHandler(point)
     } else if (currentCanvasMode === CanvasMode.Moving) {
-      if (currentSelectedShapeIds.length === 1) {
-        const updatedShapes = new Map(shapes);
-        const currentSelectedShape = updatedShapes.get(currentSelectedShapeIds[0])
-        if (currentSelectedShape) {
-          currentSelectedShape.x = point.x
-          currentSelectedShape.y = point.y
-          setShapes(updatedShapes)
-        }
-      }
-    
+      moveShapes(point)    
     }
+  }
+  
+  const moveShapes = (moveTo: {x: number, y: number}) => {
+    const updatedShapes = new Map(shapes);
+    currentSelectedShapeIds.map((id) => {
+      const target = updatedShapes.get(id)
+      if (target && eventOccuredPoint) {
+        target.x  = target.x + (moveTo.x - eventOccuredPoint.x)
+        target.y = target.y + (moveTo.y - eventOccuredPoint.y)
+      }
+    })
+    setEventOccuredPoint(moveTo)
+    setShapes(updatedShapes)
   }
 
   const addPencilPathToShapes = () => {
