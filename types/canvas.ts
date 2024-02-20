@@ -66,11 +66,31 @@ export type Point = {
   y: number;
 };
 
-export type Boundaries = {
+export type XYWH = {
   x: number;
   y: number;
   width: number;
   height: number;
 };
+
+export enum CanvasMode {
+  None,
+  Pressing,
+  Moving,
+  Adding,
+  Resizing,
+  Writing
+}
+
+export enum ResizeHandleType {
+  TopLeft,
+  TopCenter,
+  TopRight,
+  BottomLeft,
+  BottomRight,
+  BottomCenter,
+  MiddleLeft,
+  MiddleRight
+}
 
 export type Shape = RectangleShape | EllipseShape | PathShape | TextShape;

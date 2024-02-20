@@ -1,9 +1,9 @@
 import { colorToCss } from "@/lib/utils";
-import { RectangleShape } from "@/types/canvas";
+import { RectangleShape, Shape } from "@/types/canvas";
 
 interface RectangleProps {
   shape: RectangleShape;
-  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerDown: (e: React.PointerEvent, shape: Shape) => void;
 }
 const Rectangle = ({ shape, onPointerDown }: RectangleProps) => {
   const { x, y, width, height, fill } = shape;
@@ -11,7 +11,7 @@ const Rectangle = ({ shape, onPointerDown }: RectangleProps) => {
   return (
     <rect
       className="drop-shadow-md"
-      onPointerDown={(e) => onPointerDown(e)}
+      onPointerDown={onPointerDown ? (e) => onPointerDown(e, shape) : undefined}
       style={{
         transform: `translate(${x}px, ${y}px)`
       }}

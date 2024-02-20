@@ -6,15 +6,22 @@ import Toolbar, { Tool } from "../_components/Toolbar";
 import Path from "../_components/Path";
 import ShapePreview from "../_components/ShapePreview";
 import SelectionBox from '../_components/SelectionBox';
-import { VisibleArea, Shape, ShapeType } from "@/types/canvas";
+import { VisibleArea, Shape, ShapeType, CanvasMode, XYWH, ResizeHandleType } from "@/types/canvas";
 import {generateUUID, pointerPositionInCanvas} from "@/lib/utils";
+import { CANVAS_MODE_BY_TOOL } from "@/app/config";
+
+export type Shapes = Map<Shape['id'], Shape>
 
 const Canvas = () => {
   const [currentTool, setCurrentTool] = useState<Tool>(Tool.Select);
   const [visibleArea, setVisibleArea] = useState<VisibleArea>({ x: 0, y: 0 });
-  const [shapes, setShapes] = useState<Shape[]>([]);
+  const [shapes, setShapes] = useState<Shapes>(new Map());
   const [pencilPoints, setPencilPoints] = useState<number[][] | null>(null);
-  const [currentSelectedShapes, setCurrentSelectedShapes] = useState<Shape[]>([])
+  const [currentSelectedShapeIds, setCurrentSelectedShapeIds] = useState<Shape['id'][]>([])
+  const [currentCanvasMode, setCurrentCanvasMode] = useState<CanvasMode>(CanvasMode.None);
+  const [currentResizeHandleType, setCurrentResizeHandleType] = useState<ResizeHandleType | null>(null);
+  const [initialResizeBoundaries, setInitialResizeBoundaries] = useState<XYWH | null>(null);  
+  const currentSelectedShapes = currentSelectedShapeIds.map((id) => shapes.get(id)).filter((shape) => shape !== undefined) as Shape[]
 
   useEffect(() => {
     document.body.classList.add("overflow-hidden", "overscroll-none");
@@ -22,12 +29,14 @@ const Canvas = () => {
       document.body.classList.remove("overflow-hidden", "overscroll-none");
     };
   }, []);
-  
-  const toolbarClickHandler = (tool: Tool) => {
+
+  const toolSelectedHandler = (tool: Tool) => {
+    const canvasMode = CANVAS_MODE_BY_TOOL[tool]
+    setCurrentCanvasMode(canvasMode)
     setCurrentTool(tool);
   };
 
-  const viewportScrollHandler = useCallback((e: React.WheelEvent) => {
+  const canvasWheelHandler = useCallback((e: React.WheelEvent) => {
     setVisibleArea((area) => {
       return {
         x: area.x - e.deltaX,
@@ -46,57 +55,122 @@ const Canvas = () => {
     setPencilPoints([...pencilPoints, [point.x, point.y, pressure]]);
   }
 
+  const resizeSelectedShape = (currentPointerPosition: {x: number, y: number}) => {
+    if (currentSelectedShapeIds.length !== 1 || currentCanvasMode !== CanvasMode.Resizing || currentResizeHandleType === null || initialResizeBoundaries === null) return
+    const updatedShapes = new Map(shapes);
+    const currentSelectedShape = updatedShapes.get(currentSelectedShapeIds[0])
+    if (!currentSelectedShape) return
+    const {x: targetShapeX, y: targetShapeY, width: targetShapeWidth, height: targetShapeHeight} = initialResizeBoundaries
+
+    const formulas = {
+      [ResizeHandleType.TopLeft]: ['resizeLeft', 'resizeTop'],
+      [ResizeHandleType.TopCenter]: ['resizeTop'],
+      [ResizeHandleType.TopRight]: ['resizeTop', 'resizeRight'],
+      [ResizeHandleType.MiddleLeft]: ['resizeLeft'],
+      [ResizeHandleType.MiddleRight]: ['resizeRight'],
+      [ResizeHandleType.BottomLeft]: ['resizeLeft', 'resizeBottom'],
+      [ResizeHandleType.BottomCenter]: ['resizeBottom'],
+      [ResizeHandleType.BottomRight]: ['resizeRight', 'resizeBottom'],
+    }
+    
+
+    formulas[currentResizeHandleType].forEach((formula) => {
+      if (formula === 'resizeLeft') {
+        currentSelectedShape.width = Math.abs(targetShapeWidth - (currentPointerPosition.x - targetShapeX))
+        currentSelectedShape.x = Math.min(currentPointerPosition.x, targetShapeX + targetShapeWidth)
+      }
+      if (formula === 'resizeRight') {
+        currentSelectedShape.x = Math.min(targetShapeX, currentPointerPosition.x)
+        currentSelectedShape.width =  Math.abs(currentPointerPosition.x - targetShapeX)
+      }
+      if (formula === 'resizeTop') {
+        currentSelectedShape.height = Math.abs(targetShapeHeight - (currentPointerPosition.y - targetShapeY))
+        currentSelectedShape.y = Math.min(currentPointerPosition.y, targetShapeY + targetShapeHeight)
+      }
+      if (formula === 'resizeBottom') {
+        currentSelectedShape.y = Math.min(targetShapeY, currentPointerPosition.y)
+        currentSelectedShape.height =  Math.abs(currentPointerPosition.y - targetShapeY)
+      }
+      setShapes(updatedShapes)
+    })
+  }
+
+  const pointerDownOnShapeHandler = (e: React.PointerEvent, shape: Shape) => {
+    e.stopPropagation();
+
+    if (currentTool === Tool.Select) {
+      setCurrentCanvasMode(CanvasMode.Moving)
+      setCurrentSelectedShapeIds([shape.id])
+    }
+  }
+
   const pointerDownHandler = (e: React.PointerEvent) => {
     const point = pointerPositionInCanvas(e, visibleArea);
 
-    if (currentTool === Tool.Pencil) {
+    if (currentCanvasMode === CanvasMode.Writing) {
       startDrawing(point, e.pressure)
       return
     }
     
-    if (currentTool === Tool.Rectangle) {
-      const newShape: Shape = {
-          id: generateUUID(),
-          type: ShapeType.Rectangle,
-          x: point.x,
-          y: point.y,
-          height: 100,
-          width: 100,
-          fill: { r: 0, g: 0, b: 0 }
-        }
-      setShapes([
-        ...shapes,
-        newShape
-      ]);
-      setCurrentSelectedShapes([newShape])
-      setCurrentTool(Tool.Select);
+    if (currentCanvasMode === CanvasMode.Adding || currentCanvasMode === CanvasMode.Moving) {
+      return
     }
 
-    if (currentTool === Tool.Ellipse) {
-      const newShape: Shape =  {
-          id: generateUUID(),
-          type: ShapeType.Ellipse,
-          x: point.x,
-          y: point.y,
-          height: 100,
-          width: 100,
-          fill: { r: 0, g: 0, b: 0 }
-        }
-      setShapes([
-        ...shapes,
-        newShape,
-      ]);
-      setCurrentSelectedShapes([newShape])
-      setCurrentTool(Tool.Select);
-    }
+    setCurrentCanvasMode(CanvasMode.Pressing)
   }
 
   const pointerMoveHandler = (e: React.PointerEvent) => {
     e.preventDefault();
     const point = pointerPositionInCanvas(e, visibleArea);
 
-     if (currentTool === Tool.Pencil) {
+     if (currentCanvasMode === CanvasMode.Writing) {
       continueDrawing(point, e.pressure)
+    } else if (currentCanvasMode === CanvasMode.Resizing) {
+      resizeSelectedShape(point)
+    } else if (currentCanvasMode === CanvasMode.Moving) {
+      if (currentSelectedShapeIds.length === 1) {
+        const updatedShapes = new Map(shapes);
+        const currentSelectedShape = updatedShapes.get(currentSelectedShapeIds[0])
+        if (currentSelectedShape) {
+          currentSelectedShape.x = point.x
+          currentSelectedShape.y = point.y
+          setShapes(updatedShapes)
+        }
+      }
+    
+    }
+  }
+  
+  const pointerUpHandler = (e: React.PointerEvent) => {
+    if (currentCanvasMode === CanvasMode.Writing) {
+      addPencilPathToShapes()
+      setPencilPoints(null)
+      return
+    }
+
+    const point = pointerPositionInCanvas(e, visibleArea);
+    if (currentCanvasMode === CanvasMode.Adding) {
+      const shapeType = currentTool === Tool.Rectangle ? ShapeType.Rectangle : ShapeType.Ellipse;
+      const newShape: Shape = {
+        id: generateUUID(),
+        type: shapeType,
+        x: point.x,
+        y: point.y,
+        height: 100,
+        width: 100,
+        fill: { r: 0, g: 0, b: 0 }
+      }
+      if (!shapes.has(newShape.id)) {
+        const updatedShape = new Map(shapes)
+        updatedShape.set(newShape.id, newShape);
+        setShapes(updatedShape);
+        setCurrentSelectedShapeIds([newShape.id])
+        setCurrentTool(Tool.Select);
+        setCurrentCanvasMode(CanvasMode.None)
+      }
+      return
+    } else  {
+      setCurrentCanvasMode(CanvasMode.None)
     }
   }
 
@@ -105,7 +179,8 @@ const Canvas = () => {
     
     const id = generateUUID()
 
-    setShapes([...shapes, {
+    const updatedShape = new Map(shapes)
+    updatedShape.set(id, {
       id,
       type: ShapeType.Path,
       x: 0,
@@ -114,28 +189,28 @@ const Canvas = () => {
       width: 0,
       fill: { r: 0, g: 0, b: 0 },
       points: pencilPoints
-    }])
+    });
+    setShapes(updatedShape);
   }
 
-  const pointerUpHandler = (e: React.PointerEvent) => {
-    if (currentTool === Tool.Pencil) {
-      addPencilPathToShapes()
-      setPencilPoints(null)
-    }
+  const shapeResizeClickHandler = (type: ResizeHandleType, boundaries: XYWH) => {
+    setCurrentCanvasMode(CanvasMode.Resizing)
+    setCurrentResizeHandleType(type)
+    setInitialResizeBoundaries(boundaries)
   }
 
   return (
     <div className="h-full bg-neutral-100 touch-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
       <div className="relative h-full">
         <div className="absolute top-[50%] -translate-y-[50%] left-2">
-          <Toolbar currentTool={currentTool} onClick={toolbarClickHandler} />
+          <Toolbar currentTool={currentTool} onClick={toolSelectedHandler} />
         </div>
         <svg
           className="h-full w-full"
           onPointerDown={pointerDownHandler}
           onPointerMove={pointerMoveHandler}
           onPointerUp={pointerUpHandler}
-          onWheel={viewportScrollHandler}
+          onWheel={canvasWheelHandler}
           xmlns="http://www.w3.org/2000/svg"
         >
           <g
@@ -144,18 +219,18 @@ const Canvas = () => {
               transform: `translate(${visibleArea.x}px, ${visibleArea.y}px)`
             }}
           >
-            {shapes.map((shape) => {
+            {Array.from(shapes).map(([_id, shape]) => {
               return (
                 <ShapePreview
                   key={shape.id}
                   shape={shape}
                   strokeColor="blue"
-                  onPointerDown={(e) => {}}
+                  onPointerDown={pointerDownOnShapeHandler}
                 />
               );
             })}
 
-            <SelectionBox shapes={currentSelectedShapes} />
+            <SelectionBox shapes={currentSelectedShapes} onShapeResizeHandleClick={shapeResizeClickHandler}   />
 
             {pencilPoints && pencilPoints.length > 0 && (
               <Path
@@ -169,7 +244,6 @@ const Canvas = () => {
                   fill: { r: 0, g: 0, b: 0 },
                   points: pencilPoints
                 }}
-                onPointerDown={() => {}}
               />
             )}
           </g>

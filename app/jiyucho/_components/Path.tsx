@@ -1,11 +1,11 @@
 import { colorToCss } from "@/lib/utils";
-import { PathShape } from "@/types/canvas";
+import { Shape, PathShape } from "@/types/canvas";
 import {getSvgPathFromStroke} from "@/lib/utils";
 import {getStroke} from 'perfect-freehand'
 
 interface PathProps {
   shape: PathShape;
-  onPointerDown?: (e: React.PointerEvent) => void;
+  onPointerDown?: (e: React.PointerEvent, shape: Shape) => void;
 }
 const Path = ({ shape, onPointerDown }: PathProps) => {
   const { x, y, points, fill } = shape;
@@ -13,7 +13,7 @@ const Path = ({ shape, onPointerDown }: PathProps) => {
   return (
     <path
       className="drop-shadow-md"
-      onPointerDown={onPointerDown}
+      onPointerDown={onPointerDown ? (e) => onPointerDown(e, shape) : undefined}
       style={{
         transform: `translate(${x}px, ${y}px)`
       }}

@@ -1,9 +1,9 @@
 import { colorToCss } from "@/lib/utils";
-import { EllipseShape } from "@/types/canvas";
+import { EllipseShape, Shape } from "@/types/canvas";
 
 interface EllipseProps {
   shape: EllipseShape;
-  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerDown: (e: React.PointerEvent, shape: Shape) => void;
 }
 const Ellipse = ({ shape, onPointerDown }: EllipseProps) => {
   const { x, y, width, height, fill } = shape;
@@ -11,7 +11,7 @@ const Ellipse = ({ shape, onPointerDown }: EllipseProps) => {
   return (
     <ellipse
       className="drop-shadow-md"
-      onPointerDown={(e) => onPointerDown(e)}
+      onPointerDown={onPointerDown ? (e) => onPointerDown(e, shape) : undefined}
       style={{
         transform: `translate(${x}px, ${y}px)`
       }}

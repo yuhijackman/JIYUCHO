@@ -9,7 +9,7 @@ import Path from "./Path";
 interface ShapePreviewProps {
   shape: Shape;
   strokeColor: string;
-  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerDown: (e: React.PointerEvent, shape: Shape) => void;
 }
 
 const ShapePreview = memo(({ shape, onPointerDown }: ShapePreviewProps) => {
