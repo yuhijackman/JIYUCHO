@@ -82,15 +82,4 @@ export enum CanvasMode {
   Writing
 }
 
-export enum ResizeHandleType {
-  TopLeft,
-  TopCenter,
-  TopRight,
-  BottomLeft,
-  BottomRight,
-  BottomCenter,
-  MiddleLeft,
-  MiddleRight
-}
-
 export type Shape = RectangleShape | EllipseShape | PathShape | TextShape;

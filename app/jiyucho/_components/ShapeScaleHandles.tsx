@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { XYWH, ResizeHandleType } from "@/types/canvas";
+import { XYWH } from "@/types/canvas";
+import { ResizeHandleType } from "@/app/hooks/use-resize-shape";
 
 const HANDLE_WIDTH = 8;
 

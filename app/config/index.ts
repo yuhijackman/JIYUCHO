@@ -1,6 +1,6 @@
 import { Home, Code2, Presentation } from "lucide-react";
 import { Tool } from "../jiyucho/_components/Toolbar";
-import { CanvasMode, ResizeHandleType } from "@/types/canvas";
+import { CanvasMode } from "@/types/canvas";
 
 export const PRODUCT_ITEMS = [
   {
