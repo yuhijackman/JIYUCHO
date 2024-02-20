@@ -117,6 +117,7 @@ const Canvas = () => {
       setCurrentCanvasMode(CanvasMode.None)
       updateResizeHandleType(null)
       updateInitialBoundaries(null)
+      setEventOccuredPoint(null)
     }
   }
 
