@@ -25,6 +25,7 @@ export type RectangleShape = {
   width: number;
   fill: Color;
   value?: string;
+  zIndex: number;
 };
 
 export type EllipseShape = {
@@ -36,6 +37,7 @@ export type EllipseShape = {
   width: number;
   fill: Color;
   value?: string;
+  zIndex: number;
 };
 
 export type PathShape = {
@@ -48,6 +50,7 @@ export type PathShape = {
   fill: Color;
   points: number[][];
   value?: string;
+  zIndex: number;
 };
 
 export type TextShape = {
@@ -59,6 +62,7 @@ export type TextShape = {
   width: number;
   fill: Color;
   value?: string;
+  zIndex: number;
 };
 
 export type Point = {

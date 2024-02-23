@@ -17,6 +17,7 @@ import {
 import { generateUUID, pointerPositionInCanvas } from "@/lib/utils";
 import { CANVAS_MODE_BY_TOOL } from "@/app/config";
 import { useResizeShape, ResizeHandleType } from "@/app/hooks/use-resize-shape";
+import { Button } from "@/components/ui/button";
 
 export type Shapes = Map<Shape["id"], Shape>;
 
@@ -68,6 +69,7 @@ const Canvas = () => {
     const canvasMode = CANVAS_MODE_BY_TOOL[tool];
     setCurrentCanvasMode(canvasMode);
     setCurrentTool(tool);
+    setCurrentSelectedShapeIds([]);
   };
 
   const canvasWheelHandler = useCallback((e: React.WheelEvent) => {
@@ -159,16 +161,13 @@ const Canvas = () => {
         y: point.y,
         height: 100,
         width: 100,
-        fill: currentFillColor
+        fill: currentFillColor,
+        zIndex: shapes.size
       };
-      if (!shapes.has(newShape.id)) {
-        const updatedShape = new Map(shapes);
-        updatedShape.set(newShape.id, newShape);
-        setShapes(updatedShape);
-        setCurrentSelectedShapeIds([newShape.id]);
-        setCurrentTool(Tool.Select);
-        setCurrentCanvasMode(CanvasMode.None);
-      }
+      addShape(newShape);
+      setCurrentSelectedShapeIds([newShape.id]);
+      setCurrentTool(Tool.Select);
+      setCurrentCanvasMode(CanvasMode.None);
       return;
     } else {
       setCurrentCanvasMode(CanvasMode.None);
@@ -267,20 +266,61 @@ const Canvas = () => {
   const addPencilPathToShapes = () => {
     if (pencilPoints === null) return;
 
-    const id = generateUUID();
-
-    const updatedShape = new Map(shapes);
-    updatedShape.set(id, {
-      id,
+    addShape({
+      id: generateUUID(),
       type: ShapeType.Path,
       x: 0,
       y: 0,
       height: 0,
       width: 0,
       fill: currentFillColor,
-      points: pencilPoints
+      points: pencilPoints,
+      zIndex: shapes.size + 1
     });
-    setShapes(updatedShape);
+  };
+
+  const addShape = (newShape: Shape) => {
+    setShapes((prevShapes) => {
+      const updatedShapes = new Map(prevShapes);
+      updatedShapes.set(newShape.id, newShape);
+      return updatedShapes;
+    });
+  };
+
+  const bringToFront = (shapeId: Shape["id"]) => {
+    setShapes((prevShapes) => {
+      const newShapes = new Map(prevShapes);
+      const shape = newShapes.get(shapeId);
+      if (shape) {
+        let maxZIndex = -Infinity;
+        newShapes.forEach((value, _) => {
+          if (value.zIndex > maxZIndex) {
+            maxZIndex = value.zIndex;
+          }
+        });
+        shape.zIndex = maxZIndex + 1;
+        newShapes.set(shapeId, shape);
+      }
+      return newShapes;
+    });
+  };
+
+  const sendToBack = (shapeId: Shape["id"]) => {
+    setShapes((prevShapes) => {
+      const newShapes = new Map(prevShapes);
+      const shape = newShapes.get(shapeId);
+      if (shape) {
+        let minZIndex = Infinity;
+        newShapes.forEach((value, _) => {
+          if (value.zIndex < minZIndex) {
+            minZIndex = value.zIndex;
+          }
+        });
+        shape.zIndex = minZIndex - 1;
+        newShapes.set(shapeId, shape);
+      }
+      return newShapes;
+    });
   };
 
   const shapeResizeClickHandler = (
@@ -332,16 +372,21 @@ const Canvas = () => {
               transform: `translate(${visibleArea.x}px, ${visibleArea.y}px)`
             }}
           >
-            {Array.from(shapes).map(([_id, shape]) => {
-              return (
-                <ShapePreview
-                  key={shape.id}
-                  shape={shape}
-                  strokeColor="blue"
-                  onPointerDown={pointerDownOnShapeHandler}
-                />
-              );
-            })}
+            {Array.from(shapes)
+              .sort(
+                ([_shapeAId, shapeA], [_shapeBId, shapeB]) =>
+                  shapeA.zIndex - shapeB.zIndex
+              )
+              .map(([_id, shape]) => {
+                return (
+                  <ShapePreview
+                    key={shape.id}
+                    shape={shape}
+                    strokeColor="blue"
+                    onPointerDown={pointerDownOnShapeHandler}
+                  />
+                );
+              })}
 
             <SelectionBox
               shapes={currentSelectedShapes}
@@ -369,7 +414,8 @@ const Canvas = () => {
                   height: 0,
                   width: 0,
                   fill: currentFillColor,
-                  points: pencilPoints
+                  points: pencilPoints,
+                  zIndex: shapes.size + 1
                 }}
               />
             )}
