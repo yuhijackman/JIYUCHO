@@ -292,6 +292,21 @@ const Canvas = () => {
     updateInitialBoundaries(boundaries);
   };
 
+  const currentFillColorSetHandler = (color: Color) => {
+    setCurrentFillColor(color);
+
+    if (currentSelectedShapeIds.length > 0) {
+      const updatedShapes = new Map(shapes);
+      currentSelectedShapeIds.map((id) => {
+        const target = updatedShapes.get(id);
+        if (target) {
+          target.fill = color;
+        }
+      });
+      setShapes(updatedShapes);
+    }
+  };
+
   return (
     <div className="h-full bg-neutral-100 touch-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
       <div className="relative h-full">
@@ -300,7 +315,7 @@ const Canvas = () => {
             currentTool={currentTool}
             currentFillColor={currentFillColor}
             onClick={toolSelectedHandler}
-            setFillColor={setCurrentFillColor}
+            setFillColor={currentFillColorSetHandler}
           />
         </div>
         <svg
