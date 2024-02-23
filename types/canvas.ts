@@ -79,7 +79,8 @@ export enum CanvasMode {
   Moving,
   Adding,
   Resizing,
-  Writing
+  Writing,
+  MultiSelecting
 }
 
 export type Shape = RectangleShape | EllipseShape | PathShape | TextShape;

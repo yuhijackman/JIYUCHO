@@ -6,17 +6,22 @@ import { Shape } from "@/types/canvas";
 interface SelectionBoxProps {
   shapes: Shape[];
   onShapeResizeHandleClick: ShapeScaleHandlesProps["onShapeResizeHandleClick"];
+  onSelectionBoxPointerDown: (e: React.PointerEvent) => void;
 }
 
 const SelectionBox = memo(
-  ({ shapes, onShapeResizeHandleClick }: SelectionBoxProps) => {
+  ({
+    shapes,
+    onShapeResizeHandleClick,
+    onSelectionBoxPointerDown
+  }: SelectionBoxProps) => {
     const isSingleShapeSelected = shapes.length === 1;
     const boundaries = getShapesBoundaries(shapes);
 
     return (
       <>
         <rect
-          className="fill-transparent stroke-orange-600 stroke-1 pointer-events-none"
+          className="fill-transparent stroke-orange-600 stroke-1"
           style={{
             transform: `translate(${boundaries.x}px, ${boundaries.y}px)`
           }}
@@ -24,6 +29,7 @@ const SelectionBox = memo(
           y={0}
           width={boundaries.width}
           height={boundaries.height}
+          onPointerDown={onSelectionBoxPointerDown}
         />
         {isSingleShapeSelected && (
           <ShapeScaleHandles
