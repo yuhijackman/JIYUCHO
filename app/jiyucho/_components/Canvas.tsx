@@ -11,7 +11,8 @@ import {
   Shape,
   ShapeType,
   CanvasMode,
-  XYWH
+  XYWH,
+  Color
 } from "@/types/canvas";
 import { generateUUID, pointerPositionInCanvas } from "@/lib/utils";
 import { CANVAS_MODE_BY_TOOL } from "@/app/config";
@@ -21,6 +22,11 @@ export type Shapes = Map<Shape["id"], Shape>;
 
 const Canvas = () => {
   const [currentTool, setCurrentTool] = useState<Tool>(Tool.Select);
+  const [currentFillColor, setCurrentFillColor] = useState<Color>({
+    r: 0,
+    g: 0,
+    b: 0
+  });
   const [visibleArea, setVisibleArea] = useState<VisibleArea>({ x: 0, y: 0 });
   const [shapes, setShapes] = useState<Shapes>(new Map());
   const [currentSelectedShapeIds, setCurrentSelectedShapeIds] = useState<
@@ -153,7 +159,7 @@ const Canvas = () => {
         y: point.y,
         height: 100,
         width: 100,
-        fill: { r: 0, g: 0, b: 0 }
+        fill: currentFillColor
       };
       if (!shapes.has(newShape.id)) {
         const updatedShape = new Map(shapes);
@@ -271,7 +277,7 @@ const Canvas = () => {
       y: 0,
       height: 0,
       width: 0,
-      fill: { r: 0, g: 0, b: 0 },
+      fill: currentFillColor,
       points: pencilPoints
     });
     setShapes(updatedShape);
@@ -290,7 +296,12 @@ const Canvas = () => {
     <div className="h-full bg-neutral-100 touch-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
       <div className="relative h-full">
         <div className="absolute top-[50%] -translate-y-[50%] left-2">
-          <Toolbar currentTool={currentTool} onClick={toolSelectedHandler} />
+          <Toolbar
+            currentTool={currentTool}
+            currentFillColor={currentFillColor}
+            onClick={toolSelectedHandler}
+            setFillColor={setCurrentFillColor}
+          />
         </div>
         <svg
           className="h-full w-full"
@@ -342,7 +353,7 @@ const Canvas = () => {
                   y: 0,
                   height: 0,
                   width: 0,
-                  fill: { r: 0, g: 0, b: 0 },
+                  fill: currentFillColor,
                   points: pencilPoints
                 }}
               />

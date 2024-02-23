@@ -21,7 +21,9 @@ const Rectangle = ({ shape, onPointerDown }: RectangleProps) => {
       height={height}
       strokeWidth={1}
       fill={fill ? colorToCss(fill) : "#000"}
-    />
+    >
+      aa
+    </rect>
   );
 };
 
