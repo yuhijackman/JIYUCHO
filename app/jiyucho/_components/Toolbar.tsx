@@ -1,4 +1,4 @@
-import { GradientPicker } from "@/components/GradientPicker";
+import { ColorPicker } from "@/components/ColorPicker";
 import { Button } from "@/components/ui/button";
 import { Color } from "@/types/canvas";
 import { Square, Circle, Type, Pencil, MousePointer2 } from "lucide-react";
@@ -47,7 +47,7 @@ const Toolbar = ({
       </div>
 
       <div className="p-1.5 bg-white rounded-md items-center shadow-md flex flex-col mt-2">
-        <GradientPicker
+        <ColorPicker
           pickedColor={currentFillColor}
           updatePickedColor={setFillColor}
         />

@@ -377,10 +377,10 @@ const Canvas = () => {
                 ([_shapeAId, shapeA], [_shapeBId, shapeB]) =>
                   shapeA.zIndex - shapeB.zIndex
               )
-              .map(([_id, shape]) => {
+              .map(([id, shape]) => {
                 return (
                   <ShapePreview
-                    key={shape.id}
+                    key={id}
                     shape={shape}
                     strokeColor="blue"
                     onPointerDown={pointerDownOnShapeHandler}
