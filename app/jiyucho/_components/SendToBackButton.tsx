@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SendToBack } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Hint from "@/components/Hint";
+
 interface SendToBackButtonProps {
   isActive: boolean;
   onClick: () => void;
@@ -8,14 +9,16 @@ interface SendToBackButtonProps {
 
 const SendBackToButton = ({ isActive, onClick }: SendToBackButtonProps) => {
   return (
-    <Button
-      variant="primary"
-      onClick={onClick}
-      size="icon"
-      disabled={!isActive}
-    >
-      <SendToBack />
-    </Button>
+    <Hint label="Send To Back">
+      <Button
+        variant="primary"
+        onClick={onClick}
+        size="icon"
+        disabled={!isActive}
+      >
+        <SendToBack />
+      </Button>
+    </Hint>
   );
 };
 

@@ -1,3 +1,4 @@
+import Hint from "@/components/Hint";
 import { Button } from "@/components/ui/button";
 import { BringToFrontIcon } from "lucide-react";
 interface BringToFrontButtonProps {
@@ -7,14 +8,16 @@ interface BringToFrontButtonProps {
 
 const BringToFront = ({ isActive, onClick }: BringToFrontButtonProps) => {
   return (
-    <Button
-      variant="primary"
-      onClick={onClick}
-      size="icon"
-      disabled={!isActive}
-    >
-      <BringToFrontIcon />
-    </Button>
+    <Hint label="Bring To Front">
+      <Button
+        variant="primary"
+        onClick={onClick}
+        size="icon"
+        disabled={!isActive}
+      >
+        <BringToFrontIcon />
+      </Button>
+    </Hint>
   );
 };
 

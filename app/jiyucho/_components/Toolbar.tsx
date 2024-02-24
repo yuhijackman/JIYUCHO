@@ -5,6 +5,7 @@ import { Square, Circle, Type, Pencil, MousePointer2 } from "lucide-react";
 import SendBackToButton from "./SendToBackButton";
 import BringToFrontButton from "./BringToFrontButton";
 import DeleteButton from "./DeleteButton";
+import Hint from "@/components/Hint";
 
 export enum Tool {
   Select,
@@ -27,11 +28,11 @@ export interface ToolbarProps {
 }
 
 const TOOLBAR_ITEMS = [
-  { icon: <MousePointer2 />, tool: Tool.Select },
-  { icon: <Circle />, tool: Tool.Ellipse },
-  { icon: <Square />, tool: Tool.Rectangle },
-  { icon: <Pencil />, tool: Tool.Pencil },
-  { icon: <Type />, tool: Tool.Text }
+  { icon: <MousePointer2 />, tool: Tool.Select, label: "Select" },
+  { icon: <Circle />, tool: Tool.Ellipse, label: "Ellipse" },
+  { icon: <Square />, tool: Tool.Rectangle, label: "Rectangle" },
+  { icon: <Pencil />, tool: Tool.Pencil, label: "Draw" },
+  { icon: <Type />, tool: Tool.Text, label: "Text" }
 ];
 
 const Toolbar = ({
@@ -49,14 +50,16 @@ const Toolbar = ({
     <>
       <div className="p-1.5 bg-white rounded-md items-center shadow-md flex flex-col gap-y-2">
         {TOOLBAR_ITEMS.map((item) => (
-          <Button
-            key={item.tool}
-            variant={currentTool === item.tool ? "primaryActive" : "primary"}
-            onClick={() => onClick(item.tool)}
-            size="icon"
-          >
-            {item.icon}
-          </Button>
+          <Hint key={item.tool} label={item.label}>
+            <Button
+              key={item.tool}
+              variant={currentTool === item.tool ? "primaryActive" : "primary"}
+              onClick={() => onClick(item.tool)}
+              size="icon"
+            >
+              {item.icon}
+            </Button>
+          </Hint>
         ))}
       </div>
 

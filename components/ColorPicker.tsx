@@ -9,6 +9,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { Color } from "@/types/canvas";
+import Hint from "./Hint";
 
 function hexToRgb(hex: string) {
   hex = hex.replace(/^#/, "");
@@ -44,19 +45,21 @@ export function ColorPicker({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn("h-8 w-8 flex items-center rounded-full", className)}
-        >
-          <div className="flex items-center justify-center">
-            <div
-              className="h-8 w-8 rounded-full !bg-center !bg-cover transition-all border-[1px] border-black"
-              style={{
-                background: `rgb(${pickedColor.r}, ${pickedColor.g}, ${pickedColor.b})`
-              }}
-            ></div>
-          </div>
-        </Button>
+        <Hint label="Select Colors">
+          <Button
+            variant={"outline"}
+            className={cn("h-8 w-8 flex items-center rounded-full", className)}
+          >
+            <div className="flex items-center justify-center">
+              <div
+                className="h-8 w-8 rounded-full !bg-center !bg-cover transition-all border-[1px] border-black"
+                style={{
+                  background: `rgb(${pickedColor.r}, ${pickedColor.g}, ${pickedColor.b})`
+                }}
+              ></div>
+            </div>
+          </Button>
+        </Hint>
       </PopoverTrigger>
       <PopoverContent className="w-52">
         <Tabs defaultValue="solid" className="w-full">
