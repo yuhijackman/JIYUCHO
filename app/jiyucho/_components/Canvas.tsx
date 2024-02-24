@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyboardEventHandler, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Toolbar, { Tool } from "../_components/Toolbar";
 import Path from "../_components/Path";
