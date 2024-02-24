@@ -1,7 +1,7 @@
 import { memo } from "react";
 import ShapeScaleHandles, { ShapeScaleHandlesProps } from "./ShapeScaleHandles";
 import { getShapesBoundaries } from "@/lib/utils";
-import { Shape } from "@/types/canvas";
+import { Shape, ShapeType } from "@/types/canvas";
 
 interface SelectionBoxProps {
   shapes: Shape[];
@@ -31,7 +31,7 @@ const SelectionBox = memo(
           height={boundaries.height}
           onPointerDown={onSelectionBoxPointerDown}
         />
-        {isSingleShapeSelected && (
+        {isSingleShapeSelected && shapes[0].type !== ShapeType.Path && (
           <ShapeScaleHandles
             boundaries={boundaries}
             onShapeResizeHandleClick={onShapeResizeHandleClick}

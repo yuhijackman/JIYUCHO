@@ -1,7 +1,7 @@
 import { colorToCss } from "@/lib/utils";
 import { Shape, PathShape } from "@/types/canvas";
-import {getSvgPathFromStroke} from "@/lib/utils";
-import {getStroke} from 'perfect-freehand'
+import { getSvgPathFromStroke } from "@/lib/utils";
+import { getStroke } from "perfect-freehand";
 
 interface PathProps {
   shape: PathShape;
@@ -17,7 +17,9 @@ const Path = ({ shape, onPointerDown }: PathProps) => {
       style={{
         transform: `translate(${x}px, ${y}px)`
       }}
-      d={getSvgPathFromStroke(getStroke(points, {simulatePressure: false, size: 5}))}
+      d={getSvgPathFromStroke(
+        getStroke(points, { simulatePressure: false, size: 5 })
+      )}
       x={0}
       y={0}
       strokeWidth={1}

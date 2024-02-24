@@ -131,7 +131,6 @@ const Canvas = () => {
     ) {
       return;
     }
-
     e.stopPropagation();
     const point = pointerPositionInCanvas(e, visibleArea);
     setEventOccuredPoint(point);
@@ -266,15 +265,43 @@ const Canvas = () => {
   const addPencilPathToShapes = () => {
     if (pencilPoints === null) return;
 
+    let left = Infinity;
+    let top = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+
+    for (let point of pencilPoints) {
+      let [x, y] = point;
+      if (left > x) {
+        left = x;
+      }
+
+      if (top > y) {
+        top = y;
+      }
+
+      if (x > right) {
+        right = x;
+      }
+
+      if (y > bottom) {
+        bottom = y;
+      }
+    }
+
     addShape({
       id: generateUUID(),
       type: ShapeType.Path,
-      x: 0,
-      y: 0,
-      height: 0,
-      width: 0,
+      x: left,
+      y: top,
+      width: right - left,
+      height: bottom - top,
       fill: currentFillColor,
-      points: pencilPoints,
+      points: pencilPoints.map(([x, y, pressure]) => [
+        x - left,
+        y - top,
+        pressure
+      ]),
       zIndex: shapes.size + 1
     });
   };
