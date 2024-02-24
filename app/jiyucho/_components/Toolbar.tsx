@@ -2,6 +2,10 @@ import { ColorPicker } from "@/components/ColorPicker";
 import { Button } from "@/components/ui/button";
 import { Color } from "@/types/canvas";
 import { Square, Circle, Type, Pencil, MousePointer2 } from "lucide-react";
+import SendBackToButton from "./SendToBackButton";
+import BringToFrontButton from "./BringToFrontButton";
+import DeleteButton from "./DeleteButton";
+
 export enum Tool {
   Select,
   Ellipse,
@@ -13,8 +17,13 @@ export enum Tool {
 export interface ToolbarProps {
   currentTool: Tool;
   currentFillColor: Color;
+  isXOrderSwapButtonActive: boolean;
+  isDeleteButtonActive: boolean;
   onClick: (tool: Tool) => void;
   setFillColor: (color: Color) => void;
+  onBringToFrontClick: () => void;
+  onSendBackToClick: () => void;
+  onDeleteClick: () => void;
 }
 
 const TOOLBAR_ITEMS = [
@@ -28,8 +37,13 @@ const TOOLBAR_ITEMS = [
 const Toolbar = ({
   currentTool,
   currentFillColor,
+  isXOrderSwapButtonActive,
+  isDeleteButtonActive,
   onClick,
-  setFillColor
+  setFillColor,
+  onBringToFrontClick,
+  onSendBackToClick,
+  onDeleteClick
 }: ToolbarProps) => {
   return (
     <>
@@ -46,11 +60,20 @@ const Toolbar = ({
         ))}
       </div>
 
-      <div className="p-1.5 bg-white rounded-md items-center shadow-md flex flex-col mt-2">
+      <div className="p-1.5 bg-white rounded-md items-center shadow-md flex flex-col mt-2 gap-y-2">
         <ColorPicker
           pickedColor={currentFillColor}
           updatePickedColor={setFillColor}
         />
+        <BringToFrontButton
+          onClick={onBringToFrontClick}
+          isActive={isXOrderSwapButtonActive}
+        />
+        <SendBackToButton
+          onClick={onSendBackToClick}
+          isActive={isXOrderSwapButtonActive}
+        />
+        <DeleteButton onClick={onDeleteClick} isActive={isDeleteButtonActive} />
       </div>
     </>
   );

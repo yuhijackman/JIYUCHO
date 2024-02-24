@@ -51,6 +51,7 @@ const Canvas = () => {
   const isSomeRangeMaked =
     maskedRange.from.x !== maskedRange.to.x &&
     maskedRange.from.y !== maskedRange.to.y;
+  const isShapeZOrderSwappable = currentSelectedShapeIds.length === 1;
 
   const {
     calculateXYWHAfterResize,
@@ -374,6 +375,16 @@ const Canvas = () => {
     }
   };
 
+  const deleteButtonClickHandler = () => {
+    if (currentSelectedShapeIds.length === 0) return;
+    const updatedShapes = new Map(shapes);
+    currentSelectedShapeIds.map((id) => {
+      updatedShapes.delete(id);
+    });
+    setCurrentSelectedShapeIds([]);
+    setShapes(updatedShapes);
+  };
+
   return (
     <div className="h-full bg-neutral-100 touch-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
       <div className="relative h-full">
@@ -381,8 +392,13 @@ const Canvas = () => {
           <Toolbar
             currentTool={currentTool}
             currentFillColor={currentFillColor}
+            isXOrderSwapButtonActive={isShapeZOrderSwappable}
+            isDeleteButtonActive={currentSelectedShapeIds.length > 0}
             onClick={toolSelectedHandler}
             setFillColor={currentFillColorSetHandler}
+            onBringToFrontClick={() => bringToFront(currentSelectedShapeIds[0])}
+            onSendBackToClick={() => sendToBack(currentSelectedShapeIds[0])}
+            onDeleteClick={deleteButtonClickHandler}
           />
         </div>
         <svg
