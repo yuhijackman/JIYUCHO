@@ -44,8 +44,8 @@ export function ColorPicker({
 }) {
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Hint label="Select Colors">
+      <Hint label="Select Colors">
+        <PopoverTrigger asChild>
           <Button
             variant={"outline"}
             className={cn("h-8 w-8 flex items-center rounded-full", className)}
@@ -59,8 +59,8 @@ export function ColorPicker({
               ></div>
             </div>
           </Button>
-        </Hint>
-      </PopoverTrigger>
+        </PopoverTrigger>
+      </Hint>
       <PopoverContent className="w-52">
         <Tabs defaultValue="solid" className="w-full">
           <TabsList className="w-full mb-4">

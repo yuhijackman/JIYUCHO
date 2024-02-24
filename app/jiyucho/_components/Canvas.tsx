@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { KeyboardEventHandler, useCallback, useEffect, useState } from "react";
 
 import Toolbar, { Tool } from "../_components/Toolbar";
 import Path from "../_components/Path";
@@ -65,6 +65,13 @@ const Canvas = () => {
       document.body.classList.remove("overflow-hidden", "overscroll-none");
     };
   }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", keyDownHandler);
+    return () => {
+      document.removeEventListener("keydown", keyDownHandler);
+    };
+  }, [shapes, currentSelectedShapeIds, currentCanvasMode]);
 
   const toolSelectedHandler = (tool: Tool) => {
     const canvasMode = CANVAS_MODE_BY_TOOL[tool];
@@ -375,7 +382,7 @@ const Canvas = () => {
     }
   };
 
-  const deleteButtonClickHandler = () => {
+  const deleteSelectedShapes = () => {
     if (currentSelectedShapeIds.length === 0) return;
     const updatedShapes = new Map(shapes);
     currentSelectedShapeIds.map((id) => {
@@ -383,6 +390,13 @@ const Canvas = () => {
     });
     setCurrentSelectedShapeIds([]);
     setShapes(updatedShapes);
+  };
+
+  const keyDownHandler = (e: KeyboardEvent) => {
+    const key = e.key;
+    if (key === "Backspace" || key === "Delete") {
+      deleteSelectedShapes();
+    }
   };
 
   return (
@@ -398,7 +412,7 @@ const Canvas = () => {
             setFillColor={currentFillColorSetHandler}
             onBringToFrontClick={() => bringToFront(currentSelectedShapeIds[0])}
             onSendBackToClick={() => sendToBack(currentSelectedShapeIds[0])}
-            onDeleteClick={deleteButtonClickHandler}
+            onDeleteClick={deleteSelectedShapes}
           />
         </div>
         <svg
